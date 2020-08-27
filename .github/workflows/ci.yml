@@ -4,17 +4,18 @@ on: [push, pull_request]
 
 jobs:
   tests:
+    name: Lint, build and test
     runs-on: ubuntu-latest
     env:
       ELECTRON_DISABLE_SANDBOX: 1
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js
+      - name: Use Node.js 12.x
         uses: actions/setup-node@v1.2.0
         with:
           node-version: "12.x"
-      - name: Install, lint and build
+      - name: NPM install, lint and build
         run: |
           npm ci
           npm run lint
@@ -24,14 +25,3 @@ jobs:
           export DISPLAY=':99.0'
           Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
           npm run test
-      - name: Clean xvfb
-        run: |
-          xvfb_pids=`ps aux | grep tmp/xvfb-run | grep -v grep | awk '{print $2}'`
-          if [ "$xvfb_pids" != "" ]; then
-            echo "Killing the following xvfb processes: $xvfb_pids"
-            sudo kill $xvfb_pids
-          else
-            echo "No xvfb processes to kill"
-          fi
-        env:
-          CI: true

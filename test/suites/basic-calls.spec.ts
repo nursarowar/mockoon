@@ -16,7 +16,7 @@ const cases: HttpCall[] = [
     path: '/abc/testvar/ac/1234',
     method: 'GET',
     testedResponse: {
-      status: 200,
+      status: 201,
       body: '{"response": "testvar"}'
     }
   },
