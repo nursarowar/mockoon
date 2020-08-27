@@ -14,14 +14,16 @@ jobs:
         uses: actions/setup-node@v1.2.0
         with:
           node-version: "12.x"
-      - run: sudo apt-get install xvfb
       - name: Install, lint and build
         run: |
           npm ci
           npm run lint
           npm run build:ci
       - name: Run tests
-        run: xvfb-run --auto-servernum npm run test
+        run: |
+          export DISPLAY=':99.0'
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          npm run test
       - name: Clean xvfb
         run: |
           xvfb_pids=`ps aux | grep tmp/xvfb-run | grep -v grep | awk '{print $2}'`
