@@ -13,13 +13,23 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1.2.0
         with:
-          node-version: '12.x'
+          node-version: "12.x"
+      - run: sudo apt-get install xvfb
       - name: Install, lint and build
         run: |
           npm ci
           npm run lint
           npm run build:ci
-      - name: Run headless test
-        uses: GabrielBB/xvfb-action@v1.2
-        with:
-          run: npm run test
+      - name: Run tests
+        run: xvfb-run --auto-servernum npm run test
+      - name: Clean xvfb
+        run: |
+          xvfb_pids=`ps aux | grep tmp/xvfb-run | grep -v grep | awk '{print $2}'`
+          if [ "$xvfb_pids" != "" ]; then
+            echo "Killing the following xvfb processes: $xvfb_pids"
+            sudo kill $xvfb_pids
+          else
+            echo "No xvfb processes to kill"
+          fi
+        env:
+          CI: true
